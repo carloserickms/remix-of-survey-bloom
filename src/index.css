@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* EBD Survey Design System */
+
+@layer base {
+  :root {
+    /* Base colors */
+    --background: 210 20% 98%;
+    --foreground: 220 30% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 30% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 15%;
+
+    /* Primary - Dark Blue */
+    --primary: 215 70% 25%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Light Blue */
+    --secondary: 200 80% 94%;
+    --secondary-foreground: 215 70% 25%;
+
+    /* Muted */
+    --muted: 210 20% 96%;
+    --muted-foreground: 220 10% 45%;
+
+    /* Accent */
+    --accent: 200 80% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Destructive - Red */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Success - Green */
+    --success: 142 70% 45%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning - Amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Survey Card Colors */
+    --survey-green: 142 70% 45%;
+    --survey-green-light: 142 70% 95%;
+    --survey-blue: 200 80% 50%;
+    --survey-blue-light: 200 80% 94%;
+    --survey-red: 0 72% 51%;
+    --survey-red-light: 0 72% 95%;
+    --survey-gray: 220 10% 40%;
+    --survey-gray-light: 220 10% 95%;
+
+    --border: 220 15% 90%;
+    --input: 220 15% 90%;
+    --ring: 215 70% 25%;
+
+    --radius: 0.75rem;
+
+    /* Header gradient */
+    --header-from: 215 70% 20%;
+    --header-to: 215 70% 30%;
+
+    /* Shadows */
+    --shadow-card: 0 4px 20px -4px hsl(220 30% 15% / 0.1);
+    --shadow-card-hover: 0 8px 30px -4px hsl(220 30% 15% / 0.15);
+    --shadow-option: 0 2px 10px -2px hsl(220 30% 15% / 0.08);
+    --shadow-option-hover: 0 8px 25px -4px hsl(220 30% 15% / 0.12);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 30% 15%;
+    --sidebar-primary: 215 70% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 200 80% 94%;
+    --sidebar-accent-foreground: 215 70% 25%;
+    --sidebar-border: 220 15% 90%;
+    --sidebar-ring: 215 70% 25%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+@layer components {
+  .header-gradient {
+    background: linear-gradient(135deg, hsl(var(--header-from)) 0%, hsl(var(--header-to)) 100%);
+  }
+
+  .card-shadow {
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-shadow-hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .option-shadow {
+    box-shadow: var(--shadow-option);
+  }
+
+  .option-shadow-hover {
+    box-shadow: var(--shadow-option-hover);
+  }
+
+  /* Survey option card variants */
+  .survey-option-green {
+    @apply bg-[hsl(var(--survey-green-light))] border-2 border-transparent hover:border-[hsl(var(--survey-green))] transition-all duration-200;
+  }
+
+  .survey-option-green.selected {
+    @apply border-[hsl(var(--survey-green))] ring-4 ring-[hsl(var(--survey-green)/0.2)];
+  }
+
+  .survey-option-blue {
+    @apply bg-[hsl(var(--survey-blue-light))] border-2 border-transparent hover:border-[hsl(var(--survey-blue))] transition-all duration-200;
+  }
+
+  .survey-option-blue.selected {
+    @apply border-[hsl(var(--survey-blue))] ring-4 ring-[hsl(var(--survey-blue)/0.2)];
+  }
+
+  .survey-option-red {
+    @apply bg-[hsl(var(--survey-red-light))] border-2 border-transparent hover:border-[hsl(var(--survey-red))] transition-all duration-200;
+  }
+
+  .survey-option-red.selected {
+    @apply border-[hsl(var(--survey-red))] ring-4 ring-[hsl(var(--survey-red)/0.2)];
+  }
+
+  .survey-option-gray {
+    @apply bg-[hsl(var(--survey-gray-light))] border-2 border-transparent hover:border-[hsl(var(--survey-gray))] transition-all duration-200;
+  }
+
+  .survey-option-gray.selected {
+    @apply border-[hsl(var(--survey-gray))] ring-4 ring-[hsl(var(--survey-gray)/0.2)];
+  }
+}
