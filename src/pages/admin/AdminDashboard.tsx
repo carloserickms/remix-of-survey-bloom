@@ -1,4 +1,4 @@
-import { FileText, HelpCircle, ListChecks, Edit3 } from 'lucide-react';
+import { FileText, HelpCircle, ListChecks, Edit3, BarChart3 } from 'lucide-react';
 import AdminHeader from '@/components/layout/AdminHeader';
 import AdminCard from '@/components/admin/AdminCard';
 
@@ -49,6 +49,14 @@ const AdminDashboard = () => {
               icon={Edit3}
               to="/admin/editar"
               variant="warning"
+            />
+            
+            <AdminCard
+              title="Auditar Formulário"
+              description="Visualize as respostas e estatísticas dos formulários."
+              icon={BarChart3}
+              to="/admin/auditar"
+              variant="primary"
             />
           </div>
         </div>

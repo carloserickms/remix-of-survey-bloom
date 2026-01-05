@@ -9,6 +9,7 @@ import CriarFormulario from "./pages/admin/CriarFormulario";
 import CriarPergunta from "./pages/admin/CriarPergunta";
 import CriarQuestoes from "./pages/admin/CriarQuestoes";
 import EditarQuestoes from "./pages/admin/EditarQuestoes";
+import AuditarFormulario from "./pages/admin/AuditarFormulario";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/admin/perguntas" element={<CriarPergunta />} />
           <Route path="/admin/questoes" element={<CriarQuestoes />} />
           <Route path="/admin/editar" element={<EditarQuestoes />} />
+          <Route path="/admin/auditar" element={<AuditarFormulario />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
