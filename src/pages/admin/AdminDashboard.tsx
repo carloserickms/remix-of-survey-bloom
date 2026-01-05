@@ -1,4 +1,4 @@
-import { FileText, HelpCircle, ListChecks, Edit3, BarChart3 } from 'lucide-react';
+import { FileText, HelpCircle, ListChecks, Edit3, BarChart3, Settings2 } from 'lucide-react';
 import AdminHeader from '@/components/layout/AdminHeader';
 import AdminCard from '@/components/admin/AdminCard';
 
@@ -19,6 +19,14 @@ const AdminDashboard = () => {
           </div>
 
           <div className="grid gap-4 md:gap-6">
+            <AdminCard
+              title="Gerenciar Formulários"
+              description="Ative, desative e gerencie os formulários existentes."
+              icon={Settings2}
+              to="/admin/gerenciar"
+              variant="warning"
+            />
+            
             <AdminCard
               title="Criar Formulário"
               description="Crie um novo formulário de pesquisa para a Escola Bíblica Dominical."
