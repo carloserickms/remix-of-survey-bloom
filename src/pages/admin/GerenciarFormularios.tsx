@@ -1,186 +1,164 @@
-import { useState } from 'react';
-import { ArrowLeft, Plus, Power, PowerOff } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Plus, Power, PowerOff, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import AdminHeader from '@/components/layout/AdminHeader';
-
-interface Formulario {
-  id: number;
-  titulo: string;
-  ativo: boolean;
-  criadoEm: string;
-}
+import { useGetFormularios, useAtivarFormulario, useDesativarFormulario } from '@/hooks/useSurveyData';
 
 const GerenciarFormularios = () => {
   const { toast } = useToast();
   const [novoTitulo, setNovoTitulo] = useState('');
-  const [formularios, setFormularios] = useState<Formulario[]>([
-    { id: 1, titulo: 'Perguntas para EBD', ativo: true, criadoEm: '2024-01-15' },
-    { id: 2, titulo: 'Avaliação Trimestral', ativo: false, criadoEm: '2024-02-20' },
-    { id: 3, titulo: 'Pesquisa de Satisfação', ativo: false, criadoEm: '2024-03-10' },
-  ]);
+  
+  // Pegando 'formulario' (que é a sua lista) e 'loading' do seu hook
+  const { formulario, loading } = useGetFormularios();
+  const { ativarFormulario } = useAtivarFormulario();
+  const {desativarFormulario} = useDesativarFormulario();
+  
+  // Criamos um estado local para gerenciar a lista e permitir mudanças de 'Ativo/Inativo' na tela
+  const [listaLocal, setListaLocal] = useState<any[]>([]);
 
-  const toggleFormularioStatus = (id: number) => {
-    setFormularios(prev => 
-      prev.map(form => {
-        if (form.id === id) {
-          const novoStatus = !form.ativo;
-          toast({
-            title: novoStatus ? 'Formulário ativado' : 'Formulário desativado',
-            description: `"${form.titulo}" foi ${novoStatus ? 'ativado' : 'desativado'} com sucesso.`,
-          });
-          return { ...form, ativo: novoStatus };
-        }
-        // Se ativar um formulário, desativar os outros (apenas um pode estar ativo)
-        if (!form.ativo) return form;
-        return { ...form, ativo: false };
-      })
-    );
-  };
+  // Quando o hook terminar de carregar, salvamos os dados no nosso estado local
+  useEffect(() => {
+    if (formulario) {
+      setListaLocal(formulario);
+    }
+  }, [formulario]);
 
-  const criarFormulario = () => {
-    if (!novoTitulo.trim()) {
-      toast({
-        title: 'Erro',
-        description: 'Digite um título para o formulário.',
-        variant: 'destructive',
-      });
-      return;
+  const toggleFormularioStatus = async (id: number) => {
+  // Guardamos o estado anterior para caso de erro na API
+  const estadoAnterior = [...listaLocal];
+  
+  // Encontramos o formulário que foi clicado
+  const formClicado = listaLocal.find(f => f.id === id);
+  if (!formClicado) return;
+
+  const acaoSeraAtivar = !formClicado.ativo;
+
+  // 1. Atualização Otimista da UI
+  setListaLocal(prev => 
+    prev.map(f => {
+      if (f.id === id) {
+        return { ...f, ativo: acaoSeraAtivar };
+      }
+      // Se estamos ativando este, todos os outros DEVEM ser desativados
+      if (acaoSeraAtivar) {
+        return { ...f, ativo: false };
+      }
+      return f;
+    })
+  );
+
+  try {
+    // 2. Chamada da API baseada na ação
+    if (acaoSeraAtivar) {
+      await ativarFormulario(id);
+    } else {
+      await desativarFormulario(id);
     }
 
-    const novoFormulario: Formulario = {
+    toast({
+      title: acaoSeraAtivar ? "Formulário Ativado" : "Formulário Desativado",
+      description: `O formulário "${formClicado.titulo}" foi atualizado com sucesso.`,
+    });
+  } catch (err) {
+    // 3. Reversão em caso de erro
+    setListaLocal(estadoAnterior);
+    toast({
+      title: "Erro na sincronização",
+      description: "Não foi possível salvar a alteração no servidor. Tente novamente.",
+      variant: "destructive",
+    });
+  }
+};
+
+  const criarFormulario = () => {
+    if (!novoTitulo.trim()) return;
+    
+    // Logica de criação (local por enquanto)
+    const novo = {
       id: Date.now(),
       titulo: novoTitulo,
       ativo: false,
-      criadoEm: new Date().toISOString().split('T')[0],
+      created_at: new Date().toISOString()
     };
-
-    setFormularios(prev => [...prev, novoFormulario]);
-    setNovoTitulo('');
     
-    toast({
-      title: 'Formulário criado',
-      description: `"${novoTitulo}" foi criado com sucesso.`,
-    });
+    setListaLocal([novo, ...listaLocal]);
+    setNovoTitulo('');
   };
 
   return (
     <div className="min-h-screen bg-background">
       <AdminHeader />
-      
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <Link to="/admin" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar ao painel
+              <ArrowLeft className="h-4 w-4 mr-2" /> Voltar ao painel
             </Link>
-            
-            <h1 className="font-display text-3xl font-bold text-foreground mb-2">
-              Gerenciar Formulários
-            </h1>
-            <p className="text-muted-foreground">
-              Crie novos formulários e controle quais estão ativos para receber respostas.
-            </p>
+            <h1 className="text-3xl font-bold">Gerenciar Formulários</h1>
           </div>
 
-          {/* Criar novo formulário */}
+          {/* Card de Criação */}
           <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="h-5 w-5" />
-                Criar Novo Formulário
-              </CardTitle>
-              <CardDescription>
-                Adicione um novo formulário de pesquisa
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <Label htmlFor="titulo">Título do Formulário</Label>
-                  <Input
-                    id="titulo"
-                    placeholder="Ex: Pesquisa EBD 2024"
-                    value={novoTitulo}
-                    onChange={(e) => setNovoTitulo(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && criarFormulario()}
-                  />
-                </div>
-                <div className="flex items-end">
-                  <Button onClick={criarFormulario}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Criar
-                  </Button>
-                </div>
-              </div>
+            <CardHeader><CardTitle>Novo Formulário</CardTitle></CardHeader>
+            <CardContent className="flex gap-4">
+              <Input 
+                placeholder="Título..." 
+                value={novoTitulo} 
+                onChange={e => setNovoTitulo(e.target.value)} 
+              />
+              <Button onClick={criarFormulario}><Plus className="mr-2 h-4 w-4"/> Criar</Button>
             </CardContent>
           </Card>
 
-          {/* Lista de formulários */}
+          {/* Listagem */}
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-foreground">Formulários Existentes</h2>
-            
-            {formularios.map((formulario) => (
-              <Card 
-                key={formulario.id} 
-                className={`transition-all ${formulario.ativo ? 'border-primary bg-primary/5' : ''}`}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        <h3 className="font-semibold text-foreground">{formulario.titulo}</h3>
-                        {formulario.ativo && (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-success/10 text-success">
-                            <Power className="h-3 w-3" />
-                            Ativo
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Criado em: {new Date(formulario.criadoEm).toLocaleDateString('pt-BR')}
+            {loading ? (
+              <div className="flex justify-center py-10"><Loader2 className="animate-spin text-primary" /></div>
+            ) : (
+              listaLocal.map((item) => (
+                <Card key={item.id} className={item.ativo ? "border-primary bg-primary/5" : ""}>
+                  <CardContent className="p-6 flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-lg">{item.titulo}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        ID: {item.id} • Criado em: {new Date(item.created_at).toLocaleDateString()}
                       </p>
                     </div>
-                    
+
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
-                        <Label htmlFor={`switch-${formulario.id}`} className="text-sm text-muted-foreground">
-                          {formulario.ativo ? (
-                            <span className="flex items-center gap-1 text-success">
-                              <Power className="h-4 w-4" />
-                              Ativo
+                        <Label htmlFor={`s-${item.id}`} className="cursor-pointer">
+                          {item.ativo ? (
+                            <span className="text-green-600 flex items-center gap-1 text-sm font-bold">
+                              <Power className="h-4 w-4" /> ATIVO
                             </span>
                           ) : (
-                            <span className="flex items-center gap-1">
-                              <PowerOff className="h-4 w-4" />
-                              Inativo
+                            <span className="text-muted-foreground flex items-center gap-1 text-sm">
+                              <PowerOff className="h-4 w-4" /> INATIVO
                             </span>
                           )}
                         </Label>
-                        <Switch
-                          id={`switch-${formulario.id}`}
-                          checked={formulario.ativo}
-                          onCheckedChange={() => toggleFormularioStatus(formulario.id)}
+                        <Switch 
+                          id={`s-${item.id}`}
+                          checked={item.ativo}
+                          onCheckedChange={() => toggleFormularioStatus(item.id)}
                         />
                       </div>
+                      
+                      {/* Botão para ver auditoria deste form */}
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/admin/auditar`}>Ver Dados</Link>
+                      </Button>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-
-            {formularios.length === 0 && (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <p className="text-muted-foreground">Nenhum formulário criado ainda.</p>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              ))
             )}
           </div>
         </div>

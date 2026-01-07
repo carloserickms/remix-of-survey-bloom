@@ -12,21 +12,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useFormularios } from '@/hooks/useSurveyData';
+import { useCreatePergunta, useGetFormularios } from '@/hooks/useSurveyData';
 import { useToast } from '@/hooks/use-toast';
 
 const CriarPergunta = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { formularios, loading: loadingFormularios } = useFormularios();
-  
+  const { formulario , loading: loadingFormularios } = useGetFormularios();
+
+  const { createPergunta } = useCreatePergunta();
+
   const [titulo, setTitulo] = useState('');
   const [formularioId, setFormularioId] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!titulo.trim()) {
       toast({
         title: 'Campo obrigatório',
@@ -47,19 +49,24 @@ const CriarPergunta = () => {
 
     try {
       setLoading(true);
-      
+
       // Simulating API call - replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      const novaPerguntaId = String(Date.now());
-      
+      // await new Promise(resolve => setTimeout(resolve, 800));
+
+
+
+      const novaPerguntaId = await createPergunta(formularioId, titulo);
+
+      console.log('Nova pergunta criada com ID:', novaPerguntaId);
+
       toast({
         title: 'Pergunta criada!',
         description: 'Agora configure as 4 questões desta pergunta.',
       });
-      
+
       // Redirect to create questions with the new pergunta ID
-      navigate(`/admin/questoes?perguntaId=${novaPerguntaId}&titulo=${encodeURIComponent(titulo)}`);
-      
+      navigate(`/admin/questoes?perguntaId=${novaPerguntaId.id}&titulo=${encodeURIComponent(titulo)}`);
+
     } catch (error) {
       toast({
         title: 'Erro',
@@ -74,7 +81,7 @@ const CriarPergunta = () => {
   return (
     <div className="min-h-screen bg-background">
       <AdminHeader />
-      
+
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-xl mx-auto">
           <Button
@@ -106,8 +113,8 @@ const CriarPergunta = () => {
                     <SelectValue placeholder={loadingFormularios ? "Carregando..." : "Selecione um formulário"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {formularios.map((form) => (
-                      <SelectItem key={form.id} value={form.id}>
+                    {formulario != null && formulario.map((form) => (
+                      <SelectItem key={form.id} value={String(form.id)}>
                         {form.titulo}
                       </SelectItem>
                     ))}

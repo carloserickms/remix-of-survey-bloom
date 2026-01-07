@@ -1,29 +1,31 @@
 // Centralized API Configuration
 // All endpoints are defined here for easy maintenance and backend integration
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
 export const API_ENDPOINTS = {
   // Formulários
-  GET_FORMULARIO_ATIVO: `${API_BASE_URL}/formularios/ativo`,
-  GET_FORMULARIOS: `${API_BASE_URL}/formularios`,
-  CREATE_FORMULARIO: `${API_BASE_URL}/formularios`,
+  GET_FORMULARIO_ATIVO: `${API_BASE_URL}/exibir_formularios`,
+  GET_FORMULARIOS: `${API_BASE_URL}/exibir_todos_formularios`,
+  CREATE_FORMULARIO: `${API_BASE_URL}/criar_formulario`,
+  ATIVAR_FORMULARIO: `${API_BASE_URL}/ativar_formulario`,
+  DESATIVAR_FORMULARIO: `${API_BASE_URL}/desativar_formulario`,
   
   // Perguntas
   GET_PERGUNTAS: (formularioId: string) => `${API_BASE_URL}/formularios/${formularioId}/perguntas`,
-  CREATE_PERGUNTA: `${API_BASE_URL}/perguntas`,
+  CREATE_PERGUNTA: `${API_BASE_URL}/criar_pergunta`,
   
   // Questões
   GET_QUESTOES: (perguntaId: string) => `${API_BASE_URL}/perguntas/${perguntaId}/questoes`,
-  CREATE_QUESTAO: `${API_BASE_URL}/questoes`,
+  CREATE_QUESTAO: `${API_BASE_URL}/criar_questao`,
   EDIT_QUESTAO: (questaoId: string) => `${API_BASE_URL}/questoes/${questaoId}`,
   DELETE_QUESTAO: (questaoId: string) => `${API_BASE_URL}/questoes/${questaoId}`,
   
   // Respostas
-  ENVIAR_RESPOSTAS: `${API_BASE_URL}/respostas`,
+  ENVIAR_RESPOSTAS: `${API_BASE_URL}/responder_questao`,
   
   // Auditoria
-  AUDITAR_FORMULARIO: (formularioId: string) => `${API_BASE_URL}/formularios/${formularioId}/auditoria`,
+  AUDITAR_FORMULARIO: (formularioId: string) => `${API_BASE_URL}/auditar_formulario`,
 } as const;
 
 // API Helper functions

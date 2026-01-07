@@ -5,13 +5,13 @@ import AdminHeader from '@/components/layout/AdminHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useFormularios } from '@/hooks/useSurveyData';
 import { useToast } from '@/hooks/use-toast';
+import { useCreateFormulario } from '@/hooks/useSurveyData';
 
 const CriarFormulario = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { createFormulario } = useFormularios();
+  const { createFormulario } = useCreateFormulario();
   
   const [titulo, setTitulo] = useState('');
   const [loading, setLoading] = useState(false);

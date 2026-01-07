@@ -48,11 +48,11 @@ const SurveyOptionCard = ({ questao, index, isSelected, onSelect }: SurveyOption
       )}
       
       <div className={cn("transition-transform duration-300", isSelected && "scale-110")}>
-        <IconComponent className={cn("w-10 h-10 md:w-12 md:h-12", iconColorClasses[colorVariant])} />
+        {/* <IconComponent className={cn("w-10 h-10 md:w-12 md:h-12", iconColorClasses[colorVariant])} /> */}
       </div>
       
       <span className={cn(
-        "text-center font-medium text-sm md:text-base leading-snug",
+        "text-center  font-medium text-sm md:text-base leading-snug",
         isSelected ? "text-foreground" : "text-foreground/80"
       )}>
         {questao.titulo}

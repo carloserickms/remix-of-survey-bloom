@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import type { Questao } from '@/types/survey';
+import { useCreateQuestao } from '@/hooks/useSurveyData';
 
 const MAX_QUESTOES = 4;
 
@@ -15,6 +16,7 @@ const CriarQuestoes = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const {createQuestao} = useCreateQuestao();
   
   const perguntaId = searchParams.get('perguntaId');
   const perguntaTitulo = searchParams.get('titulo') || 'Pergunta sem título';
@@ -51,7 +53,7 @@ const CriarQuestoes = () => {
       setLoading(true);
       
       // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await createQuestao(perguntaId || '', titulo.trim());
       
       const novaQuestao: Questao = {
         id: String(Date.now()),

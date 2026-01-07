@@ -1,10 +1,15 @@
 // Types for the Survey System
 
+export interface FormularioData{
+  data: Formulario[];
+}
+
+
 export interface Formulario {
   id: string;
   titulo: string;
   ativo: boolean;
-  criadoEm: string;
+  created_at: string;
   perguntas?: Pergunta[];
 }
 
@@ -12,8 +17,8 @@ export interface Pergunta {
   id: string;
   titulo: string;
   formularioId: string;
-  ordem: number;
   questoes: Questao[];
+  respostas_totais: number;
 }
 
 export interface Questao {
@@ -22,14 +27,14 @@ export interface Questao {
   perguntaId: string;
   icone?: string;
   cor?: 'green' | 'blue' | 'red' | 'gray';
+  quantidade_respostas: number;
 }
 
 export interface Resposta {
-  perguntaId: string;
-  questaoId: string;
+  id: string;
 }
 
 export interface RespostaPayload {
-  formularioId: string;
+  id: string;
   respostas: Resposta[];
 }

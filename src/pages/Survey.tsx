@@ -5,28 +5,27 @@ import SurveyOptionCard from '@/components/survey/SurveyOptionCard';
 import ProgressIndicator from '@/components/survey/ProgressIndicator';
 import { Button } from '@/components/ui/button';
 import { useFormularioAtivo, useEnviarRespostas } from '@/hooks/useSurveyData';
-import type { Resposta } from '@/types/survey';
 
 const Survey = () => {
   const { formulario, loading, error } = useFormularioAtivo();
   const { enviarRespostas, loading: enviando, success } = useEnviarRespostas();
   
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [respostas, setRespostas] = useState<Map<string, Resposta>>(new Map());
+  // Guardamos as respostas: Chave é o ID da pergunta, Valor é o ID da questão selecionada
+  const [respostas, setRespostas] = useState<Record<string, any>>({});
 
   const perguntas = formulario?.perguntas || [];
   const perguntaAtual = perguntas[currentIndex];
   const totalPerguntas = perguntas.length;
   const isLastQuestion = currentIndex === totalPerguntas - 1;
   
-  const respostaAtual = perguntaAtual ? respostas.get(perguntaAtual.id) : undefined;
+  const respostaAtual = perguntaAtual ? respostas[perguntaAtual.id] : undefined;
 
-  const handleSelectOption = useCallback((perguntaId: string, questaoId: string) => {
-    setRespostas(prev => {
-      const newMap = new Map(prev);
-      newMap.set(perguntaId, { perguntaId, questaoId });
-      return newMap;
-    });
+  const handleSelectOption = useCallback((perguntaId: string | number, questaoId: string | number) => {
+    setRespostas(prev => ({
+      ...prev,
+      [perguntaId]: questaoId
+    }));
   }, []);
 
   const handleNext = useCallback(() => {
@@ -38,36 +37,24 @@ const Survey = () => {
   const handleSubmit = useCallback(async () => {
     if (!formulario) return;
     
-    const payload = {
-      formularioId: formulario.id,
-      respostas: Array.from(respostas.values()),
-    };
+    // Transformamos o objeto de respostas em um array de objetos com a chave questaoId
+    const listaParaEnviar = Object.values(respostas).map(qId => ({
+      questaoId: qId
+    }));
     
-    await enviarRespostas(payload);
+    await enviarRespostas(listaParaEnviar);
   }, [formulario, respostas, enviarRespostas]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center animate-fade-in">
-          <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Carregando pesquisa...</p>
-        </div>
-      </div>
-    );
-  }
+  // Estados de erro e loading (mantidos como no seu original, mas com nomes de campos corrigidos)
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-primary w-10 h-10" /></div>;
 
-  if (error || !formulario) {
+  if (error || !formulario || perguntas.length === 0) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center p-8 bg-card rounded-xl shadow-card max-w-md animate-fade-in">
-          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">😕</span>
-          </div>
-          <h2 className="font-display text-xl font-semibold mb-2">Ops!</h2>
-          <p className="text-muted-foreground">
-            {error || 'Não há nenhuma pesquisa ativa no momento.'}
-          </p>
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 text-center">
+        <div className="bg-card p-8 rounded-2xl shadow-sm border border-border max-w-sm">
+          <span className="text-4xl mb-4 block">📝</span>
+          <h2 className="text-xl font-bold mb-2">Nenhuma pesquisa disponível</h2>
+          <p className="text-muted-foreground">{error || 'Aguarde um novo formulário ser ativado.'}</p>
         </div>
       </div>
     );
@@ -75,94 +62,66 @@ const Survey = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-background">
-        <SurveyHeader titulo={formulario.titulo} />
-        <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
-          <div className="text-center p-8 bg-card rounded-xl shadow-card max-w-md animate-scale-in">
-            <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="w-10 h-10 text-success" />
-            </div>
-            <h2 className="font-display text-2xl font-bold text-foreground mb-3">
-              Obrigado!
-            </h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Suas respostas foram enviadas com sucesso. Agradecemos sua participação na avaliação da Escola Bíblica Dominical.
-            </p>
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="text-center animate-in fade-in zoom-in duration-300">
+          <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle2 className="w-10 h-10" />
           </div>
+          <h2 className="text-3xl font-bold mb-4">Enviado com sucesso!</h2>
+          <p className="text-muted-foreground max-w-xs mx-auto">
+            Sua participação foi registrada. Obrigado por ajudar a melhorar nossa EBD!
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/30">
       <SurveyHeader titulo={formulario.titulo} />
       
-      <main className="container mx-auto px-4 py-8 md:py-12">
-        {/* Progress */}
-        <div className="mb-10 animate-fade-in">
-          <ProgressIndicator current={currentIndex + 1} total={totalPerguntas} />
-        </div>
+      <main className="container mx-auto px-4 py-8 max-w-4xl">
+        <ProgressIndicator current={currentIndex + 1} total={totalPerguntas} />
 
-        {/* Question */}
-        <div className="max-w-3xl mx-auto" key={perguntaAtual?.id}>
-          <div className="text-center mb-8 animate-fade-in">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-3 leading-tight">
-              {perguntaAtual?.titulo}
+        <div className="mt-12 space-y-8">
+          <div className="text-center">
+            <h2 className="text-2xl md:text-4xl font-black text-foreground mb-4">
+              {perguntaAtual.titulo}
             </h2>
-            <p className="text-muted-foreground">
-              Clique em uma das opções para responder.
-            </p>
+            <p className="text-muted-foreground italic">Selecione uma opção para continuar</p>
           </div>
 
-          {/* Options Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-10">
-            {perguntaAtual?.questoes.map((questao, index) => (
-              <div 
-                key={questao.id} 
-                className="animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <SurveyOptionCard
-                  questao={questao}
-                  index={index}
-                  isSelected={respostaAtual?.questaoId === questao.id}
-                  onSelect={() => handleSelectOption(perguntaAtual.id, questao.id)}
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {perguntaAtual.questoes?.map((questao: any, index: number) => (
+              <SurveyOptionCard
+                key={questao.id}
+                questao={questao}
+                index={index}
+                isSelected={respostaAtual === questao.id}
+                onSelect={() => handleSelectOption(perguntaAtual.id, questao.id)}
+              />
             ))}
           </div>
 
-          {/* Navigation */}
-          <div className="flex justify-center animate-fade-in" style={{ animationDelay: '400ms' }}>
+          <div className="flex justify-center pt-8">
             {isLastQuestion ? (
-              <Button
-                size="lg"
+              <Button 
+                size="lg" 
+                className="w-full md:w-64 h-14 text-lg font-bold" 
                 onClick={handleSubmit}
                 disabled={!respostaAtual || enviando}
-                className="px-8 gap-2 font-semibold"
               >
-                {enviando ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Enviando...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-5 h-5" />
-                    Enviar respostas
-                  </>
-                )}
+                {enviando ? <Loader2 className="animate-spin mr-2" /> : <Send className="mr-2 w-5 h-5" />}
+                Finalizar Pesquisa
               </Button>
             ) : (
-              <Button
-                size="lg"
+              <Button 
+                size="lg" 
+                className="w-full md:w-64 h-14 text-lg font-bold" 
                 onClick={handleNext}
                 disabled={!respostaAtual}
-                className="px-8 gap-2 font-semibold"
               >
-                Próxima pergunta
-                <ChevronRight className="w-5 h-5" />
+                Próxima Pergunta <ChevronRight className="ml-2 w-5 h-5" />
               </Button>
             )}
           </div>
