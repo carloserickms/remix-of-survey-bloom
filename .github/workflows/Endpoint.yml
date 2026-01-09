@@ -1,0 +1,14 @@
+- name: Call /health endpoint
+        run: |
+          CODE=$(curl -s -L -o /dev/null -w "%{http_code}" \
+            -H "User-Agent: GitHubActions-HealthCheck" \
+            "https://backend-fdns.onrender.com/api/v1/exibir_formularios")
+          
+          echo "Status Code: $CODE"
+          
+          if [ "$CODE" -eq 200 ]; then
+            echo "Backend está online!"
+          else
+            echo "Erro ao contactar backend: $CODE"
+            exit 1
+          fi
