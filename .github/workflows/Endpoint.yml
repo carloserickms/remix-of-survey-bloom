@@ -1,14 +1,25 @@
-- name: Call /health endpoint
+name: Ping Health Endpoint
+
+on:
+  schedule:
+    - cron: "*/1 * * * *" # Executa a cada 1 minuto
+  workflow_dispatch: # Permite rodar manualmente pelo botão no GitHub
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /health endpoint
         run: |
           CODE=$(curl -s -L -o /dev/null -w "%{http_code}" \
             -H "User-Agent: GitHubActions-HealthCheck" \
             "https://backend-fdns.onrender.com/api/v1/exibir_formularios")
           
-          echo "Status Code: $CODE"
+          echo "Status Code recebido: $CODE"
           
           if [ "$CODE" -eq 200 ]; then
-            echo "Backend está online!"
+            echo "Backend está online e acessível!"
           else
-            echo "Erro ao contactar backend: $CODE"
+            echo "Erro: O backend retornou status $CODE"
             exit 1
           fi
