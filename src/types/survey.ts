@@ -4,6 +4,10 @@ export interface FormularioData{
   data: Formulario[];
 }
 
+export interface PerguntaData{
+  data: Pergunta[];
+}
+
 
 export interface Formulario {
   id: string;

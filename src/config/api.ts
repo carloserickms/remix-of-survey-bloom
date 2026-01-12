@@ -1,7 +1,7 @@
 // Centralized API Configuration
 // All endpoints are defined here for easy maintenance and backend integration
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://backend-fdns.onrender.com/api/v1';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
 export const API_ENDPOINTS = {
   // Formulários
@@ -12,13 +12,13 @@ export const API_ENDPOINTS = {
   DESATIVAR_FORMULARIO: `${API_BASE_URL}/desativar_formulario`,
   
   // Perguntas
-  GET_PERGUNTAS: (formularioId: string) => `${API_BASE_URL}/formularios/${formularioId}/perguntas`,
+  GET_PERGUNTAS:  `${API_BASE_URL}/listar_perguntas`,
   CREATE_PERGUNTA: `${API_BASE_URL}/criar_pergunta`,
   
   // Questões
   GET_QUESTOES: (perguntaId: string) => `${API_BASE_URL}/perguntas/${perguntaId}/questoes`,
   CREATE_QUESTAO: `${API_BASE_URL}/criar_questao`,
-  EDIT_QUESTAO: (questaoId: string) => `${API_BASE_URL}/questoes/${questaoId}`,
+  EDIT_QUESTAO: `${API_BASE_URL}/editar_questao`,
   DELETE_QUESTAO: (questaoId: string) => `${API_BASE_URL}/questoes/${questaoId}`,
   
   // Respostas

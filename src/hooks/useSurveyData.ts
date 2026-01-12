@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { API_ENDPOINTS, apiRequest } from '@/config/api';
-import type { Formulario, FormularioData, Pergunta, Questao, Resposta, RespostaPayload } from '@/types/survey';
+import type { Formulario, FormularioData, Pergunta, PerguntaData, Questao, Resposta, RespostaPayload } from '@/types/survey';
 import { exitCode } from 'process';
 
 // Mock data for development (remove when connecting to real backend)
@@ -84,6 +84,36 @@ export const useFormularioAtivo = () => {
 
   return { formulario, loading, error };
 };
+
+export const useGetPerguntas = () => {
+  const [perguntas, setPerguntas] = useState<Pergunta[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPerguntas = async () => {
+      try {
+        setLoading(true);
+        // Uncomment when backend is ready:
+        const data = await apiRequest<Pergunta[]>(API_ENDPOINTS.GET_PERGUNTAS);
+        console.log('Perguntas recebidas:', data);
+        setPerguntas(data)
+        // Mock data for development:
+        // await new Promise(resolve => setTimeout(resolve, 800));
+        // setPerguntas(mockPerguntas);
+      } catch (err) {
+        setError('Erro ao carregar perguntas');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPerguntas();
+  }, []);
+
+  return { perguntas, loading, error };
+}
 
 export const useGetFormularios = () => {
   const [formulario, setFormulario] = useState<Formulario[] | null>(null);
@@ -245,4 +275,24 @@ export const useDesativarFormulario = () => {
   };
 
   return { desativarFormulario };
+}
+
+export const useEditarQuestao = () => {
+  const editarQuestao = async (questao: Questao): Promise<void> => {
+    try {
+      await apiRequest(API_ENDPOINTS.EDIT_QUESTAO, {
+        headers: {
+          'Content-Type': 'application/json',
+      },
+        method: 'POST',
+        body: JSON.stringify(questao),
+      });
+
+      console.log('Questão editada:', questao);
+    } catch (err) {
+      throw new Error('Erro ao editar questão');
+    }
+  };
+
+  return { editarQuestao };
 }

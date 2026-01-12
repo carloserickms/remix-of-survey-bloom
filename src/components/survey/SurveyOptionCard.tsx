@@ -9,7 +9,7 @@ interface SurveyOptionCardProps {
   onSelect: () => void;
 }
 
-const colorVariants = ['green', 'blue', 'red', 'gray'] as const;
+const colorVariants = ['green', 'blue', 'gray', 'red'] as const;
 const icons = [Smile, ThumbsUp, Meh, Frown];
 
 const SurveyOptionCard = ({ questao, index, isSelected, onSelect }: SurveyOptionCardProps) => {
@@ -19,15 +19,15 @@ const SurveyOptionCard = ({ questao, index, isSelected, onSelect }: SurveyOption
   const colorClasses = {
     green: 'survey-option-green',
     blue: 'survey-option-blue',
-    red: 'survey-option-red',
     gray: 'survey-option-gray',
+    red: 'survey-option-red',
   };
 
   const iconColorClasses = {
     green: 'text-survey-green',
     blue: 'text-survey-blue',
-    red: 'text-survey-red',
     gray: 'text-survey-gray',
+    red: 'text-survey-red',
   };
 
   return (
@@ -52,7 +52,7 @@ const SurveyOptionCard = ({ questao, index, isSelected, onSelect }: SurveyOption
       </div>
       
       <span className={cn(
-        "text-center  font-medium text-sm md:text-base leading-snug",
+        "text-center  font-medium text-2xl leading-snug",
         isSelected ? "text-foreground" : "text-foreground/80"
       )}>
         {questao.titulo}

@@ -25,47 +25,50 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import type { Pergunta, Questao } from '@/types/survey';
+import { useGetPerguntas } from '@/hooks/useSurveyData';
 
 // Mock data
-const mockPerguntas: Pergunta[] = [
-  {
-    id: 'p1',
-    titulo: 'Como você avalia a qualidade das lições apresentadas?',
-    formularioId: '1',
-    ordem: 1,
-    questoes: [
-      { id: 'q1', titulo: 'Excelente - Muito didático', perguntaId: 'p1' },
-      { id: 'q2', titulo: 'Bom - Aprendi bastante', perguntaId: 'p1' },
-      { id: 'q3', titulo: 'Regular - Pode melhorar', perguntaId: 'p1' },
-      { id: 'q4', titulo: 'Insatisfatório', perguntaId: 'p1' },
-    ],
-  },
-  {
-    id: 'p2',
-    titulo: 'O horário das aulas é adequado para você?',
-    formularioId: '1',
-    ordem: 2,
-    questoes: [
-      { id: 'q5', titulo: 'Sim, perfeito', perguntaId: 'p2' },
-      { id: 'q6', titulo: 'Sim, mas poderia ser mais cedo', perguntaId: 'p2' },
-      { id: 'q7', titulo: 'Sim, mas poderia ser mais tarde', perguntaId: 'p2' },
-      { id: 'q8', titulo: 'Não, é muito inconveniente', perguntaId: 'p2' },
-    ],
-  },
-];
+// const mockPerguntas: Pergunta[] = [
+//   {
+//     id: 'p1',
+//     titulo: 'Como você avalia a qualidade das lições apresentadas?',
+//     formularioId: '1',
+//     ordem: 1,
+//     questoes: [
+//       { id: 'q1', titulo: 'Excelente - Muito didático', perguntaId: 'p1' },
+//       { id: 'q2', titulo: 'Bom - Aprendi bastante', perguntaId: 'p1' },
+//       { id: 'q3', titulo: 'Regular - Pode melhorar', perguntaId: 'p1' },
+//       { id: 'q4', titulo: 'Insatisfatório', perguntaId: 'p1' },
+//     ],
+//   },
+//   {
+//     id: 'p2',
+//     titulo: 'O horário das aulas é adequado para você?',
+//     formularioId: '1',
+//     ordem: 2,
+//     questoes: [
+//       { id: 'q5', titulo: 'Sim, perfeito', perguntaId: 'p2' },
+//       { id: 'q6', titulo: 'Sim, mas poderia ser mais cedo', perguntaId: 'p2' },
+//       { id: 'q7', titulo: 'Sim, mas poderia ser mais tarde', perguntaId: 'p2' },
+//       { id: 'q8', titulo: 'Não, é muito inconveniente', perguntaId: 'p2' },
+//     ],
+//   },
+// ];
 
 const EditarQuestoes = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  const [perguntas] = useState<Pergunta[]>(mockPerguntas);
+
+  const { perguntas, loading } = useGetPerguntas();
   const [selectedPerguntaId, setSelectedPerguntaId] = useState('');
   const [questoes, setQuestoes] = useState<Questao[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState<string | null>(null);
 
-  const selectedPergunta = perguntas.find(p => p.id === selectedPerguntaId);
+  console.log('Perguntas:', perguntas);
+
+  const selectedPergunta = perguntas?.find(pergunta => pergunta.id === selectedPerguntaId);
 
   useEffect(() => {
     if (selectedPergunta) {
@@ -92,19 +95,19 @@ const EditarQuestoes = () => {
 
     try {
       setSaving(questaoId);
-      
+
       // Simulating API call
       await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setQuestoes(prev => 
-        prev.map(q => 
+
+      setQuestoes(prev =>
+        prev.map(q =>
           q.id === questaoId ? { ...q, titulo: editValue.trim() } : q
         )
       );
-      
+
       setEditingId(null);
       setEditValue('');
-      
+
       toast({
         title: 'Salvo!',
         description: 'Questão atualizada com sucesso.',
@@ -124,9 +127,9 @@ const EditarQuestoes = () => {
     try {
       // Simulating API call
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       setQuestoes(prev => prev.filter(q => q.id !== questaoId));
-      
+
       toast({
         title: 'Excluído!',
         description: 'Questão removida com sucesso.',
@@ -148,7 +151,7 @@ const EditarQuestoes = () => {
   return (
     <div className="min-h-screen bg-background">
       <AdminHeader />
-      
+
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-2xl mx-auto">
           <Button
@@ -180,11 +183,21 @@ const EditarQuestoes = () => {
                     <SelectValue placeholder="Selecione uma pergunta" />
                   </SelectTrigger>
                   <SelectContent>
-                    {perguntas.map((pergunta) => (
-                      <SelectItem key={pergunta.id} value={pergunta.id}>
-                        {pergunta.titulo}
-                      </SelectItem>
-                    ))}
+                    {loading ? (
+                        <div>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Carregando...
+
+                        </div>
+                        
+                    ) : (
+                      perguntas.map(pergunta => (
+                        <SelectItem key={pergunta.id} value={pergunta.id}>
+                          {pergunta.titulo} ({pergunta.respostas_totais} respostas)
+                        </SelectItem> 
+                      ))
+                    )
+                  }
                   </SelectContent>
                 </Select>
               </div>
@@ -194,9 +207,9 @@ const EditarQuestoes = () => {
                   <h3 className="font-medium text-foreground">
                     Questões ({questoes.length})
                   </h3>
-                  
+
                   {questoes.map((questao, index) => (
-                    <div 
+                    <div
                       key={questao.id}
                       className="p-4 bg-muted rounded-lg animate-fade-in"
                     >
@@ -204,7 +217,7 @@ const EditarQuestoes = () => {
                         <span className="w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
                           {index + 1}
                         </span>
-                        
+
                         {editingId === questao.id ? (
                           <Input
                             value={editValue}
@@ -218,7 +231,7 @@ const EditarQuestoes = () => {
                           </span>
                         )}
                       </div>
-                      
+
                       <div className="flex justify-end gap-2">
                         {editingId === questao.id ? (
                           <>
@@ -254,7 +267,7 @@ const EditarQuestoes = () => {
                               <Edit2 className="w-4 h-4" />
                               Editar
                             </Button>
-                            
+
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button

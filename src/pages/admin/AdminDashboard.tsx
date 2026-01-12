@@ -6,7 +6,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <AdminHeader />
-      
+
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-4xl mx-auto">
           <div className="mb-10 animate-fade-in">
@@ -20,21 +20,13 @@ const AdminDashboard = () => {
 
           <div className="grid gap-4 md:gap-6">
             <AdminCard
-              title="Gerenciar Formulários"
-              description="Ative, desative e gerencie os formulários existentes."
-              icon={Settings2}
-              to="/admin/gerenciar"
-              variant="warning"
-            />
-            
-            <AdminCard
               title="Criar Formulário"
               description="Crie um novo formulário de pesquisa para a Escola Bíblica Dominical."
               icon={FileText}
               to="/admin/formularios"
               variant="primary"
             />
-            
+
             <AdminCard
               title="Criar Perguntas"
               description="Adicione novas perguntas aos formulários existentes."
@@ -42,15 +34,7 @@ const AdminDashboard = () => {
               to="/admin/perguntas"
               variant="secondary"
             />
-            
-            <AdminCard
-              title="Criar Questões"
-              description="Configure as opções de resposta para cada pergunta (máximo 4)."
-              icon={ListChecks}
-              to="/admin/questoes"
-              variant="success"
-            />
-            
+
             <AdminCard
               title="Editar Questões"
               description="Visualize e edite as questões existentes em cada pergunta."
@@ -58,7 +42,15 @@ const AdminDashboard = () => {
               to="/admin/editar"
               variant="warning"
             />
-            
+
+            <AdminCard
+              title="Gerenciar Formulários"
+              description="Ative, desative e gerencie os formulários existentes."
+              icon={Settings2}
+              to="/admin/gerenciar"
+              variant="warning"
+            />
+
             <AdminCard
               title="Auditar Formulário"
               description="Visualize as respostas e estatísticas dos formulários."
