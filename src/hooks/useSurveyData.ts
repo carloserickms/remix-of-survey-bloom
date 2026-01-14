@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { API_ENDPOINTS, apiRequest } from '@/config/api';
-import type { Formulario, FormularioData, Pergunta, PerguntaData, Questao, Resposta, RespostaPayload } from '@/types/survey';
+import type { enviarQuestao, Formulario, FormularioData, Pergunta, PerguntaData, Questao, Resposta, RespostaPayload } from '@/types/survey';
 import { exitCode } from 'process';
 
 // Mock data for development (remove when connecting to real backend)
@@ -278,7 +278,7 @@ export const useDesativarFormulario = () => {
 }
 
 export const useEditarQuestao = () => {
-  const editarQuestao = async (questao: Questao): Promise<void> => {
+  const editarQuestao = async (questao: enviarQuestao): Promise<void> => {
     try {
       await apiRequest(API_ENDPOINTS.EDIT_QUESTAO, {
         headers: {

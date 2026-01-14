@@ -24,8 +24,8 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import type { Pergunta, Questao } from '@/types/survey';
-import { useGetPerguntas } from '@/hooks/useSurveyData';
+import type { enviarQuestao, Pergunta, Questao } from '@/types/survey';
+import { useEditarQuestao, useGetPerguntas } from '@/hooks/useSurveyData';
 
 // Mock data
 // const mockPerguntas: Pergunta[] = [
@@ -60,6 +60,7 @@ const EditarQuestoes = () => {
   const { toast } = useToast();
 
   const { perguntas, loading } = useGetPerguntas();
+  const { editarQuestao } = useEditarQuestao();
   const [selectedPerguntaId, setSelectedPerguntaId] = useState('');
   const [questoes, setQuestoes] = useState<Questao[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -97,7 +98,14 @@ const EditarQuestoes = () => {
       setSaving(questaoId);
 
       // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // await new Promise(resolve => setTimeout(resolve, 500));
+
+      const payload : enviarQuestao = {
+        id: questaoId,
+        titulo: editValue.trim(),
+      };
+
+      await editarQuestao(payload);
 
       setQuestoes(prev =>
         prev.map(q =>

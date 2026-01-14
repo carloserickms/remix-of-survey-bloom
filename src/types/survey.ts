@@ -34,6 +34,11 @@ export interface Questao {
   quantidade_respostas: number;
 }
 
+export interface enviarQuestao {
+  id: string;
+  titulo: string;
+}
+
 export interface Resposta {
   id: string;
 }
